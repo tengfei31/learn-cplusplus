@@ -16,10 +16,38 @@ public:
     virtual ~ThreadPool();
     //添加任务
     template<typename F, typename ...Args>
-    auto enqueue(F&& func, Args&&... args) -> std::future<typename std::invoke_result_t<Func(Args...)>>;
+    auto enqueue(F&& func, Args&&... args) -> std::future<typename std::invoke_result_t<F(Args...)>> {
+        using return_type = typename std::invoke_result_t<F(Args...)>;
+        auto task = std::make_shared<std::packaged_task<return_type()> >(
+            std::bind(std::forward<F>(func), std::forward<Args>(args)...)
+        );
+        std::future<return_type> res = task->get_future();
+        {
+            std::unique_lock<std::mutex> lock(this->mtx);
+            if (stop) {
+                //std::cerr << "threadPool is stoped" << std::endl;
+                //return std::future<return_type>();
+                throw std::runtime_error("threadPool is stoped");
+            }
+            tasks_queue.emplace([task, args...](){(*task)(args...);});
+        }
+        cv.notify_one();
+
+        return res;
+    }
     //添加任务
     template<typename F, typename ...Args>
-    void addTask(F func, Args... args);
+    void addTask(F func, Args... args) {
+        std::unique_lock<std::mutex> lock(this->mtx);
+        if (stop) {
+            std::cerr << "threadPool is stoped" << std::endl;
+            return;
+        }
+        tasks_queue.emplace([func, args...](){
+            func(args...);
+        });
+        cv.notify_one();
+    }
 private:
     //单个worker线程
     void workThread();

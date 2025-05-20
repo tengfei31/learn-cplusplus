@@ -4,16 +4,31 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include "utils/thread_pool.h"
+// #include "util/inc/sysapi/nio.h"
 
 
 // class TcpServer {
 
 // };
 
+ThreadPool threadPool(4);
 
-int start() {
-    int sockFd;
-    if (sockFd = socket(AF_INET, SOCK_STREAM, 0) < 0) {
+void handle_connection(int clientFd) {
+    char buffer[1024];
+    read(clientFd, buffer, sizeof(buffer));
+    std::cout << "Client message: " << buffer << std::endl;
+
+    std::string msg = "welcome to cpp world\n";
+    write(clientFd, msg.c_str(), msg.length());
+
+    close(clientFd);
+}
+
+
+int tcp_server() {
+    int sockFd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockFd < 0) {
         std::cerr << "Socket creation failed" << std::endl;
         return -1;
     }
@@ -41,10 +56,18 @@ int start() {
         }
         //将客户端链接分发到线程池中
         std::cout << "Client connected: " << inet_ntoa(clientAddr.sin_addr) << ":" << ntohs(clientAddr.sin_port) << '\n';
-        
 
+        threadPool.addTask([](int clientFd){
+            char buffer[1024];
+            read(clientFd, buffer, sizeof(buffer));
+            std::cout << "Client message: " << buffer << std::endl;
 
-        close(clientFd);
+            std::string msg = "welcome to cpp world\n";
+            write(clientFd, msg.c_str(), msg.length());
+
+            close(clientFd);
+        }, clientFd);
+        //threadPool.addTask(handle_connection, clientFd);
 
     }
     close(sockFd);
@@ -54,5 +77,8 @@ int start() {
     return 0;
 }
 
-
+int main() {
+    tcp_server();
+    return 0;
+}
 
