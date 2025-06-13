@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "${workspaceFolder}/src/**",
+                "${workspaceFolder}/include/**",
+                "${workspaceFolder}/include/util/**",
+                "/opt/homebrew/opt/openssl/include/**",
+                "/opt/homebrew/opt/googletest/include/**",
+                "/opt/homebrew/opt/glog/include/**",
+                "/opt/homebrew/opt/gflags/include/**"
+            ],
+            "compilerPath": "/opt/homebrew/opt/llvm/bin/clang++",
+            "cStandard": "c23",
+            "cppStandard": "c++20",
+            "intelliSenseMode": "macos-clang-arm64"
+        }
+    ],
+    "version": 4
+}
