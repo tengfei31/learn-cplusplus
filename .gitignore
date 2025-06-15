@@ -2,3 +2,5 @@
 include/util
 build/
 test/*.out
+tags
+
