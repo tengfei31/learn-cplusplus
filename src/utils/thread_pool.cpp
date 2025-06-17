@@ -4,9 +4,8 @@ ThreadPool::ThreadPool(int poolSize):poolSize(poolSize), stop(false) {
     worker_threads.reserve(poolSize);
     int i = 0;
     for (; i < poolSize; i++) {
-        //worker_threads[i] = workThread;
-        worker_threads.emplace_back(worker_threads);
         worker_threads.emplace_back([this](){
+            // workThread();
             while(true) {
                 Func task;
                 {

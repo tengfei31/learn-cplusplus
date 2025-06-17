@@ -1,27 +1,7 @@
 #include "cpp_inc/coroutine_default_sche.h"
 #include <thread>
 #include <iostream>
-#include <glog/logging.h>
-
-void SetupLogging(const std::string& logDir)
-{
-    // 设置日志输出目录
-    FLAGS_log_dir = logDir;
-    // google::SetLogDestination(google::INFO, "./logs/my_log_");
-
-    // 设置日志级别
-    FLAGS_stderrthreshold = google::INFO;
-
-    // 设置日志文件大小为10MB
-    FLAGS_max_log_size = 10 * 1024;  // 10MB
-
-    // 禁用日志文件名中的机器名后缀
-    FLAGS_alsologtostderr = true;
-    FLAGS_logtostderr = false;
-
-    // 自动移除旧日志 day （apt旧版本没有）
-    // google::EnableLogCleaner(3);
-}
+#include "utils/logger.h"
 
 //这是一个全局的协程调度器
 util::CoroutineDefaultSche sche;
@@ -41,14 +21,6 @@ util::CoroutinePromise<void> handle(int params)
 //测试C++20协程
 void test_coroutine()
 {
-    // 设置日志目录
-    std::string logDir = "./logs";
-
-    // 初始化日志
-    SetupLogging(logDir);
-
-    // 初始化 Glog
-    google::InitGoogleLogging("./logs");
 
     // std::thread t([](){
 
@@ -62,7 +34,7 @@ void test_coroutine()
                 co_await handle(params);
             });
             // std::cout << "readyExec after: " << i << std::endl;
-            LOG(INFO) << "readyExec after: " << i << std::endl;
+            LOG(INFO) << "readyExec after: " << i;
         };
         //调度协程
         while(sche.doSche(2000) == util::CoroutineDefaultSche::ST_RUN);

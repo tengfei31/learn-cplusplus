@@ -3,8 +3,17 @@ cmake_minimum_required(VERSION 3.24)
 # 定义项目名称和使用的语言
 project(learn-cplusplus LANGUAGES CXX)
 # 设置C++标准为C++20
+set(CMAKE_CXX_COMPILER /opt/homebrew/opt/llvm/bin/clang++)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lc++")
+message(STATUS "Using C++ compiler: ${CMAKE_CXX_COMPILER}")
+execute_process(COMMAND ${CMAKE_CXX_COMPILER} --version OUTPUT_VARIABLE COMPILER_VERSION)
+message(STATUS "Compiler version: ${COMPILER_VERSION}")
+
+set(CMAKE_TOOLCHAIN_FILE /Users/wtf/vcpkg/scripts/buildsystems/vcpkg.cmake)
+
 # 设置构建类型（Debug/Release），默认为Debug
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
@@ -14,15 +23,16 @@ endif()
 cmake_policy(SET CMP0167 OLD)
 
 find_package(Boost REQUIRED COMPONENTS system filesystem thread)
-# find_package(glog REQUIRED)
+find_package(glog CONFIG REQUIRED)
 find_package(gflags REQUIRED)
+find_package(OpenSSL REQUIRED COMPONENTS Crypto)
 include(FindPkgConfig)
-# pkg_check_modules(glog REQUIRED IMPORTED_TARGET glog)
-# pkg_check_modules(gflags REQUIRED IMPORTED_TARGET gflags)
 # 添加头文件目录
 include_directories(
     ${PROJECT_SOURCE_DIR}/include
-    /Users/wtf/Documents/www/c/util
+    ${PROJECT_SOURCE_DIR}/include/utils
+    "/Users/wtf/Documents/www/c/util"
+    ${llvm_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS}
     ${glog_INCLUDE_DIRS}
     ${gflags_INCLUDE_DIRS}
@@ -35,15 +45,16 @@ include_directories(
 # )
 
 # 收集所有源文件
-file(GLOB SOURCES "src/*.cpp" "main.cpp")
+file(GLOB SOURCES "src/*.cpp" "src/utils/*.cpp" "main.cpp")
 # 添加可执行文件目标
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 # 链接所需的库（如果有的话）
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-    glog
+    glog::glog
     Boost::system
     Boost::filesystem
     Boost::thread
+    OpenSSL::Crypto
 )
