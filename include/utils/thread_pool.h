@@ -1,3 +1,7 @@
+
+#ifndef THREAD_POOL_H
+#define THREAD_POOL_H
+
 #include <thread>
 #include <queue>
 #include <vector>
@@ -64,3 +68,5 @@ private:
     //要运行的任务队列
     std::queue<Func> tasks_queue;
 };
+
+#endif// THREAD_POOL_H
