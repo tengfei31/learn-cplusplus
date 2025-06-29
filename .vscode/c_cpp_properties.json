@@ -7,6 +7,7 @@
                 "${workspaceFolder}/include/**",
                 "${workspaceFolder}/include/util/**",
                 "/opt/homebrew/opt/openssl/include/**",
+                "/opt/homebrew/opt/boost/include/**",
                 "/opt/homebrew/opt/googletest/include/**",
                 "/opt/homebrew/opt/glog/include/**",
                 "/opt/homebrew/opt/gflags/include/**"

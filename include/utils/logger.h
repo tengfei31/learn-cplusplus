@@ -2,8 +2,17 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 #include <glog/logging.h>
+#include <sys/stat.h>
 
+class Logger {
+public:
+    Logger();
+    ~Logger();
+    void InitLogging();
+    void Flush();
+private:
+    void _SetupLogging(const std::string& logDir);
+    void _MyPrefixFormatter(std::ostream& s, const google::LogMessage& m, void* data);
+};
 
-void InitLogging();
-
-#endif// LOGGER_H
+#endif //LOGGER_H

@@ -3,6 +3,8 @@
 #include <iostream>
 #include "utils/logger.h"
 
+extern Logger logger;
+
 //这是一个全局的协程调度器
 util::CoroutineDefaultSche sche;
 
@@ -33,11 +35,13 @@ void test_coroutine()
             sche.readyExec([params = i]() -> util::CoroutinePromise<void> {
                 co_await handle(params);
             });
-            // std::cout << "readyExec after: " << i << std::endl;
             LOG(INFO) << "readyExec after: " << i;
         };
         //调度协程
-        while(sche.doSche(2000) == util::CoroutineDefaultSche::ST_RUN);
+        while(sche.doSche(2000) == util::CoroutineDefaultSche::ST_RUN) {
+            LOG(INFO) << "CoroutineDefaultSche";
+            logger.Flush();
+        };
     // });
     // t.join();
 
