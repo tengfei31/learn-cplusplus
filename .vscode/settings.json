@@ -100,5 +100,6 @@
             "binaryPath": "/Users/wtf/Documents/www/c/test/test",
             "binaryArgs": []
         }
-    ]
+    ],
+    "cmake.useCMakePresets": "auto"
 }

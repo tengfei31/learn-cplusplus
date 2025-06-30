@@ -1,6 +1,12 @@
 .DS_Store
 include/util
 build/
+log/
+logs/
 test/*.out
 tags
+vcpkg_installed/
+CMakeCache.txt
+.vscode/settings.json
+
 
