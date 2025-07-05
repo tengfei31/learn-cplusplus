@@ -20,8 +20,8 @@ public:
     virtual ~ThreadPool();
     //添加任务
     template<typename F, typename ...Args>
-    auto enqueue(F&& func, Args&&... args) -> std::future<typename std::invoke_result_t<F(Args...)>> {
-        using return_type = typename std::invoke_result_t<F(Args...)>;
+    auto enqueue(F&& func, Args&&... args) -> std::future<decltype(func(args...))> {
+        using return_type = decltype(func(args...));
         auto task = std::make_shared<std::packaged_task<return_type()> >(
             std::bind(std::forward<F>(func), std::forward<Args>(args)...)
         );
@@ -29,11 +29,9 @@ public:
         {
             std::unique_lock<std::mutex> lock(this->mtx);
             if (stop) {
-                //std::cerr << "threadPool is stoped" << std::endl;
-                //return std::future<return_type>();
                 throw std::runtime_error("threadPool is stoped");
             }
-            tasks_queue.emplace([task, args...](){(*task)(args...);});
+            tasks_queue.emplace([task](){ (*task)(); });
         }
         cv.notify_one();
 
