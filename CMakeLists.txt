@@ -25,6 +25,7 @@ find_package(Boost REQUIRED COMPONENTS system filesystem thread)
 find_package(glog CONFIG REQUIRED)
 find_package(gflags REQUIRED)
 find_package(OpenSSL REQUIRED COMPONENTS Crypto)
+set(async_simple_DIR "/Users/wtf/vcpkg/installed/arm64-osx/share/async_simple")
 find_package(async_simple CONFIG REQUIRED)
 include(FindPkgConfig)
 # 添加头文件目录
