@@ -72,7 +72,7 @@ int tcp_server() {
         //     close(clientFd);
         // }, clientFd);
         //or直接使用lambda表达式
-        threadPool.enqueue(handle_connection, clientFd);
+        threadPool.enqueue(handle_connection, clientFd).get();
         //threadPool.addTask(handle_connection, clientFd);
 
     }

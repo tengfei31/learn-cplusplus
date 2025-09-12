@@ -5,16 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "run",
+            "name": "debug-test",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/test",
+            "program": "${workspaceFolder}/test/test_openssl_evp.out",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "${workspaceFolder}/test",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "lldb"
+            "MIMode": "lldb",
+            "preLaunchTask": "make test" // 可选，自动编译
         }
 
     ]

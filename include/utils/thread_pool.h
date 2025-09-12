@@ -18,7 +18,7 @@ public:
     //using Func = std::function<void()>;
     ThreadPool(int poolSize);
     virtual ~ThreadPool();
-    //添加任务
+    //添加任务,可以获取任务结果
     template<typename F, typename ...Args>
     auto enqueue(F&& func, Args&&... args) -> std::future<decltype(func(args...))> {
         using return_type = decltype(func(args...));
@@ -36,19 +36,6 @@ public:
         cv.notify_one();
 
         return res;
-    }
-    //添加任务
-    template<typename F, typename ...Args>
-    void addTask(F func, Args... args) {
-        std::unique_lock<std::mutex> lock(this->mtx);
-        if (stop) {
-            std::cerr << "threadPool is stoped" << std::endl;
-            return;
-        }
-        tasks_queue.emplace([func, args...](){
-            func(args...);
-        });
-        cv.notify_one();
     }
 private:
     //单个worker线程
