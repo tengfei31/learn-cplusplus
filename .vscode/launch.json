@@ -16,6 +16,18 @@
             "externalConsole": false,
             "MIMode": "lldb",
             "preLaunchTask": "make test" // 可选，自动编译
+        }, {
+            "name": "tcp_server-test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/server/tcp_server",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/src/server",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "tcp_server" // 可选，自动编译
         }
 
     ]

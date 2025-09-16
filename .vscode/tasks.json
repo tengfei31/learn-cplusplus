@@ -16,6 +16,22 @@
             },
             "problemMatcher": [],
 			"detail": "test测试程序"
+		},
+		{
+			"type": "shell",
+			"label": "tcp_server",
+			"command": "make",
+			"args": [
+            ],
+			"options": {
+                "cwd": "${workspaceFolder}/src/server"
+            },
+            "group": {
+                // "kind": "build",
+                // "isDefault": true
+            },
+            "problemMatcher": [],
+			"detail": "tcp_server程序"
 		}
 	]
 }

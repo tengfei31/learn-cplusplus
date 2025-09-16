@@ -10,5 +10,5 @@ CMakeCache.txt
 .vscode/settings.json
 tcp_server
 tcp_client
-
+*.dSYM/*
 
