@@ -122,7 +122,7 @@ int main() {
 
 void handle_connection(int clientFd) {
     char buffer[1024];
-    int n = read(clientFd, buffer, sizeof(buffer));
+    int n = read(clientFd, buffer, sizeof(buffer) - 1);
     if (n < 0) {
         if (errno != EWOULDBLOCK) {
             //这里错误就断开
@@ -141,6 +141,7 @@ void handle_connection(int clientFd) {
         // closeQueueCv.notify_one();
         return ;
     }
+    buffer[n] = '\0';
     std::cout << "Client message: " << buffer << std::endl;
 
     std::string msg = "welcome to cpp world\n\n\n";
