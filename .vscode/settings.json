@@ -85,7 +85,8 @@
         "__config": "cpp",
         "thread": "cpp",
         "functional": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "chrono": "cpp"
     },
     "C_Cpp.default.includePath": [
         "${workspaceFolder}/include/**",

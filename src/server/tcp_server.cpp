@@ -15,25 +15,15 @@
 
 // };
 
-ThreadPool threadPool(4);
+ThreadPool workerThreadPool(4);
+//全局队列，用作通知关闭socket
+std::queue<int> closeQueue;
+std::mutex closeQueueMutex;
+// std::condition_variable closeQueueCv;
 
-int handle_connection(int clientFd) {
-    char buffer[1024];
-    int n = read(clientFd, buffer, sizeof(buffer));
-    if (n <= 0) {
-        return 0;
-    }
-    std::cout << "Client message: " << buffer << std::endl;
+fd_set master_set;
 
-    std::string msg = "welcome to cpp world\n\n\n";
-    int len = write(clientFd, msg.c_str(), msg.length());
-
-    //如果需要主动断开，或者检测客户端断开连接，可以通过queue队列通知主线程，来主动close和FD_CLR
-    //close(clientFd);
-
-    return len;
-}
-
+void handle_connection(int clientFd);
 
 int tcp_server() {
     int sockFd = socket(AF_INET, SOCK_STREAM, 0);
@@ -54,14 +44,34 @@ int tcp_server() {
         std::cerr << "Listen failed" << std::endl;
         return -1;
     }
+    // //增加非阻塞操作
+    // int sockFcntl;
+    // sockFcntl = fcntl(sockFd, F_GETFL, 0);
+    // fcntl(sockFd, F_SETFL, sockFcntl | O_NONBLOCK);
+
     //这里增加epoll，来处理多路复用
-    fd_set master_set, read_set;
-    FD_ZERO(&master_set);
+    fd_set read_set;
     FD_SET(sockFd, &master_set);
     int maxFd = sockFd;
     int activity;
 
     while(1) {
+        //处理已经关闭的fd
+        {
+            std::unique_lock<std::mutex> closeQueueLock(closeQueueMutex);
+            while(!closeQueue.empty()) {
+                int clientFd = closeQueue.front();
+                closeQueue.pop();
+                close(clientFd);
+                FD_CLR(clientFd, &master_set);
+                if (maxFd == clientFd) {
+                    while(maxFd >= 0 && !FD_ISSET(maxFd, &master_set)) {
+                        --maxFd;
+                    }
+                }
+            }
+        }
+
         read_set = master_set;
         activity = select(maxFd + 1, &read_set, NULL, NULL, NULL);
         if (activity < 0) {
@@ -74,6 +84,11 @@ int tcp_server() {
             socklen_t clientAddrLen = sizeof(clientAddr);
             int clientFd = accept(sockFd, (struct sockaddr*) &clientAddr, &clientAddrLen);
             if (clientFd >= 0) {
+                // //增加非阻塞操作
+                // int clientFcntl;
+                // clientFcntl = fcntl(clientFd, F_GETFL, 0);
+                // fcntl(clientFd, F_SETFL, clientFcntl | O_NONBLOCK);
+
                 FD_SET(clientFd, &master_set);
                 if (clientFd > maxFd) {
                     maxFd = clientFd;
@@ -86,12 +101,9 @@ int tcp_server() {
         int fd = 0;
         for (; fd <= maxFd; fd++) {
             if (fd != sockFd && FD_ISSET(fd, &read_set)) {
+                //TODO: 后续可将read/write放到当前主线程中，比如增加read_queue和write_queue，handl只处理具体的业务逻辑
                 //使用work线程池处理业务逻辑
-                threadPool.enqueue(handle_connection, fd);
-                // if (len <= 0) {
-                //     close(fd);
-                //     FD_CLR(fd, &master_set);
-                // }
+                workerThreadPool.enqueue(handle_connection, fd);
             }
         }
     }
@@ -101,7 +113,55 @@ int tcp_server() {
 }
 
 int main() {
+    //初始化全局变量
+    FD_ZERO(&master_set);
+
     tcp_server();
     return 0;
 }
+
+void handle_connection(int clientFd) {
+    char buffer[1024];
+    int n = read(clientFd, buffer, sizeof(buffer));
+    if (n < 0) {
+        if (errno != EWOULDBLOCK) {
+            //这里错误就断开
+            std::lock_guard<std::mutex> closeQueueLock(closeQueueMutex);
+            closeQueue.push(clientFd);
+            // closeQueueCv.notify_one();
+            return;
+        }
+    }
+    if (n == 0) {
+        std::cout << "Client No message: EOF on socket " << std::endl;
+        // {
+        //     std::lock_guard<std::mutex> closeQueueLock(closeQueueMutex);
+        //     closeQueue.push(clientFd);
+        // }
+        // closeQueueCv.notify_one();
+        return ;
+    }
+    std::cout << "Client message: " << buffer << std::endl;
+
+    std::string msg = "welcome to cpp world\n\n\n";
+    int len;
+    int w_len = 0;
+    while(true) {
+        len = write(clientFd, msg.c_str(), msg.length());
+        w_len += len;
+        if (w_len >= msg.length()) {
+            break;
+        }
+    }
+
+    //为了测试，需要主动断开，后续可能需要在具体业务中关闭
+    // {
+    //     std::lock_guard<std::mutex> closeQueueLock(closeQueueMutex);
+    //     closeQueue.push(clientFd);
+    // }
+    // closeQueueCv.notify_one();
+
+    return;
+}
+
 
