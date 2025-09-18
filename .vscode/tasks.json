@@ -22,6 +22,7 @@
 			"label": "tcp_server",
 			"command": "make",
 			"args": [
+				"-j4"
             ],
 			"options": {
                 "cwd": "${workspaceFolder}/src/server"

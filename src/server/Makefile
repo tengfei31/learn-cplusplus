@@ -13,7 +13,7 @@ DEBUG= -g -O0
 all: build
 
 build:
-	$(CXX) $(CXX_STD) $(DEBUG) -o $(PROJECT_NAME) $(CPPFLAGS) tcp_server.cpp ../utils/thread_pool.cpp
+	$(CXX) $(CXX_STD) $(DEBUG) -o $(PROJECT_NAME) $(CPPFLAGS) tcp_server.cpp tcp_server_select.cpp tcp_server_event.cpp ../utils/thread_pool.cpp
 
 clean:
 	rm -rf $(BINARY_FILE)
