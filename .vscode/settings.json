@@ -85,7 +85,17 @@
         "__config": "cpp",
         "thread": "cpp",
         "functional": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "chrono": "cpp",
+        "in.h": "c",
+        "stdint.h": "c",
+        "types.h": "c",
+        "stdlib.h": "c",
+        "_stdlib.h": "c",
+        "_malloc.h": "c",
+        "unistd.h": "c",
+        "route.h": "c",
+        "inet.h": "c"
     },
     "C_Cpp.default.includePath": [
         "${workspaceFolder}/include/**",
