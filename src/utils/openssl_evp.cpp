@@ -1,5 +1,3 @@
-#include "openssl/evp.h"
-#include "openssl/rand.h"
 #include "openssl_evp.h"
 
 #ifdef __cplusplus

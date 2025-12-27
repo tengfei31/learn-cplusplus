@@ -2,6 +2,9 @@
 #ifndef OPENSSL_EVP_H
 #define OPENSSL_EVP_H
 
+#include "openssl/evp.h"
+#include "openssl/rand.h"
+
 // 加密
 int sm4_cbc_encrypt(unsigned char *key, unsigned char *iv, unsigned char *in, int in_len, unsigned char *out, int *out_len);
 // 解密
