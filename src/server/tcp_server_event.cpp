@@ -117,7 +117,8 @@ static void handle_connection(int clientFd, int kq) {
     while(true) {
         int n = read(clientFd, buffer, sizeof(buffer));
         if (n > 0) {
-            recv_data.append(buffer);
+            // 必须带长度：buffer 没有清零，不带长度会把残留的旧数据一起拼进来
+            recv_data.append(buffer, n);
             continue;
         } else if (n == 0) {
             close_event(clientFd, kq);

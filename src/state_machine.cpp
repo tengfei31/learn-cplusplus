@@ -29,7 +29,7 @@ struct FinishWork : sc::event<FinishWork> {};
 struct Reset : sc::event<Reset> {};
 
 // State machine
-struct Process : sc::state_machine<Process, Idle> {};
+struct Process : boost::statechart::state_machine<Process, Idle> {};
 
 // States implementation
 struct Idle : sc::simple_state<Idle, Process> {
